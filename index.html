@@ -50,21 +50,153 @@ header{background:linear-gradient(135deg,#0a0f1e,#111827);border-bottom:1px soli
 .hdr-btn:hover{border-color:var(--accent2);color:var(--text);}
 .hdr-btn.danger:hover{border-color:var(--warn);color:var(--warn);}
 
-/* ─── CAMPAIGN SWITCHER ─── */
-.campaign-switcher{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:none;}
-.campaign-switcher.open{display:block;}
-.camp-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;}
-.camp-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all 0.2s;}
-.camp-item:hover{border-color:var(--accent2);}
-.camp-item.active-camp{border-color:var(--accent2);background:rgba(124,111,239,0.1);}
-.camp-item-info{flex:1;min-width:0;}
-.camp-item-name{font-weight:700;font-size:0.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.camp-item-meta{font-size:0.65rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;}
-.camp-item-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.new-camp-form{display:flex;gap:8px;margin-top:10px;}
-.new-camp-form input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.85rem;padding:9px 12px;outline:none;}
-.new-camp-form input:focus{border-color:var(--accent2);}
-.new-camp-form button{background:var(--accent2);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+/* ─── CAMPAIGN SWITCHER FULLSCREEN ─── */
+.camp-screen{
+  position:fixed;inset:0;z-index:300;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform 0.32s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.camp-screen.open{transform:translateX(0);}
+
+.camp-screen-header{
+  background:linear-gradient(135deg,#0a0f1e,#111827);
+  border-bottom:1px solid var(--border);
+  padding:18px 16px 14px;
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+}
+.camp-back-btn{
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text);border-radius:10px;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;flex-shrink:0;transition:all 0.2s;
+}
+.camp-back-btn:hover{border-color:var(--accent2);}
+.camp-screen-title{
+  font-size:1.1rem;font-weight:800;flex:1;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.camp-screen-body{flex:1;overflow-y:auto;padding:16px;}
+
+/* New campaign form at the top */
+.new-camp-card{
+  background:linear-gradient(135deg,rgba(124,111,239,0.12),rgba(0,229,160,0.05));
+  border:1.5px dashed rgba(124,111,239,0.5);
+  border-radius:18px;padding:16px;margin-bottom:20px;
+}
+.new-camp-card-title{
+  font-size:0.7rem;font-weight:700;color:var(--accent2);
+  text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;
+  font-family:'DM Mono',monospace;
+}
+.new-camp-row{display:flex;gap:8px;}
+.new-camp-input{
+  flex:1;background:var(--bg);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;
+  font-size:0.9rem;padding:11px 13px;outline:none;transition:border-color 0.2s;
+}
+.new-camp-input:focus{border-color:var(--accent2);}
+.new-camp-btn{
+  background:linear-gradient(135deg,var(--accent2),#5b4fe0);
+  border:none;color:#fff;border-radius:10px;
+  padding:11px 16px;font-family:'Syne',sans-serif;
+  font-weight:700;font-size:0.88rem;cursor:pointer;
+  white-space:nowrap;transition:opacity 0.2s;
+}
+.new-camp-btn:hover{opacity:0.85;}
+
+/* Section label */
+.camp-section-label{
+  font-size:0.62rem;font-family:'DM Mono',monospace;
+  color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;
+  margin-bottom:8px;padding-left:2px;
+}
+
+/* Campaign card */
+.camp-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:16px;margin-bottom:10px;
+  cursor:pointer;transition:all 0.22s;position:relative;overflow:hidden;
+}
+.camp-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;
+}
+.camp-card.open-camp::before{background:var(--accent);}
+.camp-card.closed-camp::before{background:var(--muted);}
+.camp-card:hover{border-color:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.camp-card.active-camp{
+  border-color:var(--accent2);
+  background:linear-gradient(135deg,rgba(124,111,239,0.15),var(--card));
+}
+.camp-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.camp-card-name{
+  font-size:1.05rem;font-weight:800;flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.camp-card-badges{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.camp-status-pill{
+  font-size:0.58rem;font-family:'DM Mono',monospace;font-weight:700;
+  padding:3px 8px;border-radius:10px;
+}
+.camp-open-pill{background:rgba(0,229,160,0.18);color:var(--accent);border:1px solid rgba(0,229,160,0.3);}
+.camp-closed-pill{background:rgba(107,127,163,0.15);color:var(--muted);border:1px solid var(--border);}
+.active-pill{
+  font-size:0.55rem;font-family:'DM Mono',monospace;font-weight:700;
+  padding:3px 8px;border-radius:10px;
+  background:rgba(124,111,239,0.3);color:#c4b5fd;border:1px solid rgba(124,111,239,0.4);
+}
+
+/* Stats row inside card */
+.camp-card-stats{
+  display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;
+}
+.camp-stat{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:5px 10px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.camp-stat-val{font-size:0.88rem;font-weight:800;font-family:'DM Mono',monospace;color:var(--accent);}
+.camp-stat-lbl{font-size:0.55rem;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-top:1px;}
+.camp-stat.exp-stat .camp-stat-val{color:var(--expense-color);}
+.camp-stat.unpaid-stat .camp-stat-val{color:var(--warn);}
+
+/* Action buttons in card */
+.camp-card-actions{display:flex;gap:6px;margin-top:12px;}
+.camp-card-btn{
+  flex:1;font-size:0.68rem;font-family:'DM Mono',monospace;font-weight:600;
+  padding:7px 6px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg);color:var(--muted2,#8099bf);
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;text-align:center;
+}
+.camp-card-btn:hover{border-color:var(--accent2);color:var(--text);}
+.camp-card-btn.switch-btn{
+  background:linear-gradient(135deg,var(--accent2),#5b4fe0);
+  border-color:var(--accent2);color:#fff;font-weight:700;
+}
+.camp-card-btn.switch-btn:hover{opacity:0.88;}
+.camp-card-btn.reopen-btn{border-color:rgba(0,229,160,0.4);color:var(--accent);}
+.camp-card-btn.close-btn{border-color:rgba(255,200,50,0.3);color:#f0b429;}
+.camp-card-btn.delete-btn-c{border-color:rgba(255,107,107,0.3);color:var(--warn);}
+.camp-card-btn.delete-btn-c:hover{background:rgba(255,107,107,0.1);}
+
+/* transition indicator when switching */
+.camp-switching-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  opacity:0;pointer-events:none;transition:opacity 0.2s;
+}
+.camp-switching-overlay.active{opacity:1;pointer-events:all;}
+.camp-switching-name{
+  font-size:1.3rem;font-weight:800;color:var(--accent);
+  font-family:'Syne',sans-serif;text-align:center;padding:0 30px;
+}
+.camp-switching-sub{font-size:0.78rem;color:var(--muted);font-family:'DM Mono',monospace;}
+
 
 /* ─── BALANCE NAV ─── */
 .balance-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;overflow-x:auto;scrollbar-width:none;}
@@ -597,7 +729,7 @@ select option{background:var(--card);}
   <div class="header-top">
     <div class="header-left">
       <h1>💰 Fund Collector</h1>
-      <div class="campaign-badge" onclick="toggleCampaignSwitcher()">
+      <div class="campaign-badge" onclick="openCampScreen()" title="Switch or create collection">
         <span class="camp-name" id="active-camp-name">No Campaign</span>
         <span class="camp-status camp-open" id="active-camp-status">OPEN</span>
         <span>▾</span>
@@ -681,14 +813,38 @@ select option{background:var(--card);}
   </div>
 </div>
 
-<!-- CAMPAIGN SWITCHER PANEL -->
-<div class="campaign-switcher" id="campaign-switcher">
-  <div class="camp-list" id="camp-list"></div>
-  <div class="new-camp-form">
-    <input type="text" id="new-camp-input" placeholder="New campaign name…" maxlength="40">
-    <button onclick="createCampaign()">＋ Create</button>
+<!-- ═══════════════════════════════════════
+     CAMPAIGN SCREEN — full-screen slide-in
+════════════════════════════════════════ -->
+<div class="camp-screen" id="camp-screen">
+  <div class="camp-screen-header">
+    <button class="camp-back-btn" onclick="closeCampScreen()">←</button>
+    <div class="camp-screen-title">📁 Collections</div>
+  </div>
+
+  <div class="camp-screen-body">
+    <!-- Create new -->
+    <div class="new-camp-card">
+      <div class="new-camp-card-title">＋ Start New Collection</div>
+      <div class="new-camp-row">
+        <input class="new-camp-input" type="text" id="new-camp-input" placeholder="e.g. School Fund 2025-2026" maxlength="50"
+          onkeydown="if(event.key==='Enter')createCampaign()">
+        <button class="new-camp-btn" onclick="createCampaign()">Create</button>
+      </div>
+    </div>
+
+    <div class="camp-section-label" id="camp-count-label">All Collections</div>
+    <div id="camp-list"></div>
   </div>
 </div>
+
+<!-- Switching overlay (brief flash when switching) -->
+<div class="camp-switching-overlay" id="camp-switching-overlay">
+  <div style="font-size:2.5rem;">📂</div>
+  <div class="camp-switching-name" id="camp-switching-name">Loading…</div>
+  <div class="camp-switching-sub">Switching collection…</div>
+</div>
+
 
 <!-- CLOSED CAMPAIGN BANNER -->
 <div class="closed-banner" id="closed-banner">
@@ -1097,8 +1253,45 @@ function createCampaign() {
   showToast('🎉 Campaign "' + name + '" started!');
 }
 
-function switchCampaign(id) {
+function openCampScreen() {
+  renderCampList();
+  document.getElementById('camp-screen').classList.add('open');
+}
+function closeCampScreen() {
+  document.getElementById('camp-screen').classList.remove('open');
+}
+
+function createCampaign() {
+  const name = document.getElementById('new-camp-input').value.trim();
+  if (!name) { showToast('⚠️ Enter a collection name'); return; }
+  const id = 'camp_' + Date.now();
+  const camp = {
+    id, name,
+    status: 'open',
+    createdAt: today(),
+    closedAt: null,
+    prevBalance: 0,
+    preset: { fixed: null, min: null, max: null },
+    contributors: [],
+    expenses: []
+  };
+  campaigns.push(camp);
   activeCampId = id;
+  saveAll();
+  document.getElementById('new-camp-input').value = '';
+  doSwitch(camp);
+}
+
+function switchCampaign(id) {
+  const camp = campaigns.find(c => c.id === id);
+  if (!camp) return;
+  activeCampId = id;
+  saveAll();
+  doSwitch(camp);
+}
+
+function doSwitch(camp) {
+  // Reset UI state
   selectMode = false;
   selectedCards.clear();
   activeFilter = 'all';
@@ -1108,64 +1301,144 @@ function switchCampaign(id) {
   if (si) si.value = '';
   const sc = document.getElementById('search-clear');
   if (sc) sc.classList.remove('visible');
-  saveAll();
-  renderCampList();
-  render();
-  toggleCampaignSwitcher(false);
-  showToast('📂 Switched to "' + getCamp().name + '"');
+
+  // Close camp screen immediately
+  document.getElementById('camp-screen').classList.remove('open');
+
+  // Show brief switching overlay
+  const overlay = document.getElementById('camp-switching-overlay');
+  const nameEl = document.getElementById('camp-switching-name');
+  if (overlay && nameEl) {
+    nameEl.textContent = camp.name;
+    overlay.classList.add('active');
+    setTimeout(() => {
+      render();
+      overlay.classList.remove('active');
+    }, 550);
+  } else {
+    render();
+  }
 }
 
 function closeCampaign() {
-  const c = getCamp();
-  if (!c) { showToast('⚠️ No campaign to close'); return; }
-  if (c.status === 'closed') { showToast('Already closed'); return; }
-  if (!confirm('Close campaign "' + c.name + '"? You can reopen it anytime.')) return;
-  c.status = 'closed';
-  c.closedAt = today();
-  saveAll();
-  render();
-  showToast('🔒 Campaign closed');
+  if (activeCampId) closeCampFromList(activeCampId);
 }
-
 function reopenCampaign() {
-  const c = getCamp();
-  if (!c) return;
-  c.status = 'open';
-  c.closedAt = null;
-  saveAll();
-  render();
-  showToast('🔓 Campaign reopened');
+  if (activeCampId) reopenCampFromList(activeCampId);
 }
 
-function toggleCampaignSwitcher(forceState) {
-  const sw = document.getElementById('campaign-switcher');
-  if (forceState === false) { sw.classList.remove('open'); return; }
-  sw.classList.toggle('open');
-  if (sw.classList.contains('open')) renderCampList();
-}
+
 
 function renderCampList() {
   const list = document.getElementById('camp-list');
+  const label = document.getElementById('camp-count-label');
+  if (label) label.textContent = `All Collections (${campaigns.length})`;
+
   if (campaigns.length === 0) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:10px;">No campaigns yet. Create one below ↓</div>';
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted);">
+      <div style="font-size:2.5rem;margin-bottom:10px;">📭</div>
+      No collections yet. Create your first one above!
+    </div>`;
     return;
   }
+
   list.innerHTML = campaigns.slice().reverse().map(c => {
-    const total = (c.contributors||[]).reduce((s,x)=>s+(x.status==='paid'?x.amount:0),0);
-    const paidN = (c.contributors||[]).filter(x=>x.status==='paid').length;
+    const contribs = c.contributors || [];
+    const expenses = c.expenses || [];
+    const total = contribs.reduce((s,x)=>s+(x.status==='paid'?x.amount:0), 0);
+    const paidN  = contribs.filter(x=>x.status==='paid').length;
+    const unpaidN = contribs.length - paidN;
+    const expTotal = expenses.reduce((s,e)=>s+e.amount, 0);
     const isActive = c.id === activeCampId;
-    return `<div class="camp-item${isActive?' active-camp':''}" onclick="switchCampaign('${c.id}')">
-      <div class="camp-item-info">
-        <div class="camp-item-name">${c.name}</div>
-        <div class="camp-item-meta">${fmtDate(c.createdAt)}${c.closedAt?' → '+fmtDate(c.closedAt):''} · ${(c.contributors||[]).length} people</div>
+    const isOpen   = c.status === 'open';
+    const pct = contribs.length ? Math.round(paidN/contribs.length*100) : 0;
+
+    return `<div class="camp-card ${isOpen?'open-camp':'closed-camp'}${isActive?' active-camp':''}">
+
+      <div class="camp-card-top">
+        <div class="camp-card-name">${c.name}</div>
+        <div class="camp-card-badges">
+          ${isActive ? '<span class="active-pill">● ACTIVE</span>' : ''}
+          <span class="camp-status-pill ${isOpen?'camp-open-pill':'camp-closed-pill'}">${isOpen?'OPEN':'CLOSED'}</span>
+        </div>
       </div>
-      <div class="camp-item-right">
-        <span style="font-size:0.72rem;font-family:'DM Mono',monospace;font-weight:800;color:var(--accent);">${fmt(total)} DJF</span>
-        <span class="camp-status ${c.status==='open'?'camp-open':'camp-closed'}">${c.status.toUpperCase()}</span>
+
+      <div style="font-size:0.6rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;">
+        Created ${fmtDate(c.createdAt)}${c.closedAt?' · Closed '+fmtDate(c.closedAt):''}
+      </div>
+
+      <!-- Progress bar -->
+      <div style="margin-top:10px;">
+        <div style="height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width 0.4s;"></div>
+        </div>
+        <div style="font-size:0.58rem;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;">${pct}% paid</div>
+      </div>
+
+      <div class="camp-card-stats">
+        <div class="camp-stat">
+          <div class="camp-stat-val">${fmt(total)}</div>
+          <div class="camp-stat-lbl">DJF Raised</div>
+        </div>
+        <div class="camp-stat">
+          <div class="camp-stat-val">${paidN}</div>
+          <div class="camp-stat-lbl">Paid</div>
+        </div>
+        <div class="camp-stat unpaid-stat">
+          <div class="camp-stat-val">${unpaidN}</div>
+          <div class="camp-stat-lbl">Unpaid</div>
+        </div>
+        ${expTotal > 0 ? `<div class="camp-stat exp-stat">
+          <div class="camp-stat-val">${fmt(expTotal)}</div>
+          <div class="camp-stat-lbl">Expenses</div>
+        </div>` : ''}
+      </div>
+
+      <div class="camp-card-actions">
+        ${!isActive
+          ? `<button class="camp-card-btn switch-btn" onclick="switchCampaign('${c.id}')">▶ Switch Here</button>`
+          : `<span style="font-size:0.68rem;color:var(--accent);font-family:'DM Mono',monospace;padding:7px 6px;">✓ Currently Active</span>`
+        }
+        ${isOpen
+          ? `<button class="camp-card-btn close-btn" onclick="closeCampFromList('${c.id}')">🔒 Close</button>`
+          : `<button class="camp-card-btn reopen-btn" onclick="reopenCampFromList('${c.id}')">🔓 Reopen</button>`
+        }
+        <button class="camp-card-btn delete-btn-c" onclick="deleteCampFromList('${c.id}')">🗑</button>
       </div>
     </div>`;
   }).join('');
 }
+
+function closeCampFromList(id) {
+  const c = campaigns.find(x=>x.id===id);
+  if (!c) return;
+  if (!confirm('Close "'+c.name+'"? You can reopen it anytime.')) return;
+  c.status='closed'; c.closedAt=today();
+  saveAll(); renderCampList();
+  if (id===activeCampId) render();
+  showToast('🔒 Collection closed');
+}
+function reopenCampFromList(id) {
+  const c = campaigns.find(x=>x.id===id);
+  if (!c) return;
+  c.status='open'; c.closedAt=null;
+  saveAll(); renderCampList();
+  if (id===activeCampId) render();
+  showToast('🔓 Collection reopened');
+}
+function deleteCampFromList(id) {
+  const c = campaigns.find(x=>x.id===id);
+  if (!c) return;
+  if (!confirm('Delete "'+c.name+'"? This cannot be undone.')) return;
+  campaigns = campaigns.filter(x=>x.id!==id);
+  if (activeCampId===id) {
+    activeCampId = campaigns.length ? campaigns[campaigns.length-1].id : null;
+  }
+  saveAll(); renderCampList();
+  render();
+  showToast('🗑 Collection deleted');
+}
+
 
 // ════════════════════════════════════
 //  EXPENSES
